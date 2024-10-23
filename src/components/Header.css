@@ -1,0 +1,110 @@
+/* Header.css */
+.header {
+  margin-left: 100px;
+  margin-right: 100px;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* First Row - Logo and Social Media Icons */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 25px;
+  padding-bottom: 15px;
+  /* background-color: aqua; */
+}
+
+.logo img {
+  /* width: 120px; */
+  size: 100px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.sign-in {
+  /* margin-right: 20px; */
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: large;
+  /* border-right: 1px solid darkgray; */
+}
+
+.social-icons {
+  display: flex;
+  align-items: center;
+}
+
+.social-icons a {
+  margin-left: 15px;
+  color: black;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+/* Second Row - Navigation and Search Icon */
+.bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #474444;
+  border-bottom: 5px solid black;
+  padding: 10px 0;
+  /* background-color: lightgreen; */
+}
+
+.navigation ul {
+  display: flex;
+  list-style: none;
+  margin-top: 7px;
+  margin-bottom: 7px;
+  padding: 0;
+}
+
+.navigation ul li {
+  margin-right: 40px;
+}
+
+.navigation ul li a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.navigation ul li a:hover {
+  color: #c70d0d;
+  animation-duration: 10ms;
+}
+
+.search-icon i {
+  font-size: 18px;
+  color: black;
+}
+
+/* Search input that appears in place of the icon */
+/* .search-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 14px;
+  outline: none;
+  width: 0;
+  transition: width 0.4s ease-in-out;
+  position: relative;
+  right: 0;
+} */
+
+/* When search input is active, it expands */
+/* .search-input:focus {
+  width: 200px;
+}
+
+.search-input::placeholder {
+  color: #aaa;
+} */

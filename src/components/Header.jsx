@@ -1,8 +1,14 @@
 // Header.js
-import React from 'react';
+import React, { useState } from 'react';
 import './Header.css';
 
 const Header = () => {
+  const [searchActive, setSearchActive] = useState(false);
+
+  const handleSearchClick = () => {
+    setSearchActive(!searchActive);
+  };
+
   return (
     <header className="header">
       <div className="top-row">
@@ -37,8 +43,13 @@ const Header = () => {
             <li><a href="/gallery">Gallery</a></li>
           </ul>
         </nav>
-        <div className="search-icon">
+        <div className={`search-icon ${searchActive ? 'active' : ''}`} onClick={handleSearchClick}>
           <i className="fas fa-search"></i>
+          <input
+            type="text"
+            className={`search-input ${searchActive ? 'active' : ''}`}
+            placeholder="Search..."
+          />
         </div>
       </div>
     </header>

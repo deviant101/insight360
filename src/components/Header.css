@@ -82,29 +82,52 @@
   animation-duration: 10ms;
 }
 
+.search-icon {
+  position: relative;
+  cursor: pointer;
+  display: flex; /* Ensures proper alignment of icon and input */
+  align-items: center; /* Vertically aligns icon and input */
+  transition: transform 0.3s ease; /* Add transition for smooth movement */
+}
+
 .search-icon i {
   font-size: 18px;
   color: black;
+  transition: opacity 0.3s ease;
+  z-index: 2; /* Ensure icon is above input when transitioning */
 }
 
-/* Search input that appears in place of the icon */
-/* .search-input {
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.search-input {
+  border: none; /* Remove default border */
+  border-bottom: 2px solid red; /* Add red underline border */
+  border-radius: 0; /* Make it fully squared */
   padding: 5px 10px;
   font-size: 14px;
   outline: none;
   width: 0;
-  transition: width 0.4s ease-in-out;
-  position: relative;
-  right: 0;
-} */
+  opacity: 0;
 
-/* When search input is active, it expands */
-/* .search-input:focus {
-  width: 200px;
+  /* Position input relative to the parent for leftward transition */
+  position: relative;
+  left: 0;
+  top: 0;
+  transform: translateX(0); /* Initial position */
+  transition: all 0.3s ease;
+
+  background-color: white; /* White background */
+  color: black; /* Initial text color - changed to black */
 }
 
-.search-input::placeholder {
-  color: #aaa;
-} */
+.search-input:focus, /* Animate on focus/typing */
+.search-input.active {
+  width: 200px;
+  opacity: 1;
+  color: black; /* Text color when active - changed to black */
+  transform: translateX(0px); /* Move input to the left by half */
+}
+
+
+.search-icon.active i {
+  opacity: 0;
+}
+

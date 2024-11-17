@@ -5,13 +5,17 @@ import Footer from './components/Footer';
 import Newsletter from './components/Newsletter';
 import './App.css';
 import NewsList from './components/NewsList';
+import VideoGallery from './components/VideoGallery';
 
 function App() {
   return (
     <div className="App">
       <Header />
       <MainSection />
-      <NewsList />
+      <NewsList category="Technology" count={4} />
+      <NewsList category="Science" count={4} />
+      <VideoGallery />
+      <NewsList category="Health" count={4} />
       <Newsletter />
       <Footer />
     </div>

@@ -21,6 +21,7 @@
     width: 1000px;
     height: 500px;
     object-fit: cover;
+    border-radius: 7px;
 }
 
 .featured-content {
@@ -65,6 +66,7 @@
     height: 240px;
     margin-right: 10px;
     object-fit: cover;
+    border-radius: 5px;
 }
 
 .side-article-content {

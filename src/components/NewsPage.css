@@ -1,0 +1,12 @@
+.news-page {
+    font-family: Arial, sans-serif;
+}
+
+.news-page main {
+    padding: 20px;
+}
+
+.news-page h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}

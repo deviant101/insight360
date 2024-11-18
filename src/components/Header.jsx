@@ -32,7 +32,6 @@ const Header = () => {
         <nav className="navigation">
           <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/page">Page</a></li>
             <li><a href="/science">Science</a></li>
             <li><a href="/technology">Technology</a></li>
             <li><a href="/beauty">Beauty</a></li>

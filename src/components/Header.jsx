@@ -32,14 +32,14 @@ const Header = () => {
         <nav className="navigation">
           <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/science">Science</a></li>
-            <li><a href="/technology">Technology</a></li>
-            <li><a href="/beauty">Beauty</a></li>
-            <li><a href="/health">Health</a></li>
-            <li><a href="/arts-culture">Arts & Culture</a></li>
-            <li><a href="/opinion">Opinion</a></li>
-            <li><a href="/videos">Videos</a></li>
-            <li><a href="/gallery">Gallery</a></li>
+            <li><a href="/Technology">Technology</a></li>
+            <li><a href="/Science">Science</a></li>
+            <li><a href="/Sports">Sports</a></li>
+            <li><a href="/Entertainment">Entertainment</a></li>
+            <li><a href="/Business">Business</a></li>
+            <li><a href="/Beauty">Beauty</a></li>
+            <li><a href="/Health">Health</a></li>
+            <li><a href="/Arts and Culture">Arts & Culture</a></li>
           </ul>
         </nav>
         <div className={`search-icon ${searchActive ? 'active' : ''}`} onClick={handleSearchClick}>

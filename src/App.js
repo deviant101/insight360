@@ -24,9 +24,7 @@ function App() {
               <NewsList category="Science" count={4} />
             </>
           } />
-          <Route path="/news/technology" element={<NewsPage category="Technology" />} />
-          <Route path="/news/science" element={<NewsPage category="Science" />} />
-          <Route path="/news/health" element={<NewsPage category="Health" />} />
+          <Route path="/:category" element={<NewsPage count={8} />} />
           {/* Add more routes as needed */}
         </Routes>
         <Newsletter />

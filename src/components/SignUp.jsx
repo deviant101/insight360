@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './SignUp.css';
 
 const SignUp = () => {
@@ -6,7 +7,7 @@ const SignUp = () => {
         <div className="signup-container">
             <div className="signup-card">
                 <h2 className="signup-title">Sign Up</h2>
-                <p className="signup-subtitle">Create your account to get full access</p>
+                <p className="signup-subtitle">Create an account to get started</p>
                 <form className="signup-form">
                     <div className="form-group">
                         <label htmlFor="fullName">Full Name</label>
@@ -38,20 +39,10 @@ const SignUp = () => {
                             required
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm Password</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            placeholder="Confirm Password"
-                            required
-                        />
-                    </div>
                     <button type="submit" className="signup-button">Sign Up</button>
                 </form>
                 <p className="signup-footer">
-                    Already have an account? <a href="/login">Login here</a>
+                    Already have an account? <Link to="/signin">Login here</Link>
                 </p>
             </div>
         </div>

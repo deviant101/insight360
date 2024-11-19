@@ -17,7 +17,7 @@ const Header = () => {
           <img src={require('../assets/logo.png')} alt="Insight360 Logo" />
         </div>
         <div className="header-right">
-          <Link to="/signup" className="sign-in">Sign In</Link>
+          <Link to="/signin" className="sign-in">Sign In</Link>
           <div className="social-icons">
             <a href="https://facebook.com"><i className="fab fa-facebook-f"></i></a>
             <a href="https://instagram.com"><i className="fab fa-instagram"></i></a>
@@ -33,14 +33,14 @@ const Header = () => {
         <nav className="navigation">
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/news/technology">Technology</Link></li>
-            <li><Link to="/news/science">Science</Link></li>
-            <li><Link to="/news/sports">Sports</Link></li>
-            <li><Link to="/news/entertainment">Entertainment</Link></li>
-            <li><Link to="/news/business">Business</Link></li>
-            <li><Link to="/news/beauty">Beauty</Link></li>
-            <li><Link to="/news/health">Health</Link></li>
-            <li><Link to="/news/arts-culture">Arts & Culture</Link></li>
+            <li><Link to="/Technology">Technology</Link></li>
+            <li><Link to="/Science">Science</Link></li>
+            <li><Link to="/Sports">Sports</Link></li>
+            <li><Link to="/Entertainment">Entertainment</Link></li>
+            <li><Link to="/Business">Business</Link></li>
+            <li><Link to="/Beauty">Beauty</Link></li>
+            <li><Link to="/Health">Health</Link></li>
+            <li><Link to="/Arts-culture">Arts & Culture</Link></li>
           </ul>
         </nav>
         <div className={`search-icon ${searchActive ? 'active' : ''}`} onClick={handleSearchClick}>

@@ -1,5 +1,6 @@
 // Header.js
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
@@ -13,10 +14,10 @@ const Header = () => {
     <header className="header">
       <div className="top-row">
         <div className="logo">
-          <img src={require('../assets/logo.png')} alt="Megasis Logo" />
+          <img src={require('../assets/logo.png')} alt="Insight360 Logo" />
         </div>
         <div className="header-right">
-          <a href="/signin" className="sign-in">Sign In</a>
+          <Link to="/signup" className="sign-in">Sign In</Link>
           <div className="social-icons">
             <a href="https://facebook.com"><i className="fab fa-facebook-f"></i></a>
             <a href="https://instagram.com"><i className="fab fa-instagram"></i></a>
@@ -31,15 +32,15 @@ const Header = () => {
       <div className="bottom-row">
         <nav className="navigation">
           <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/Technology">Technology</a></li>
-            <li><a href="/Science">Science</a></li>
-            <li><a href="/Sports">Sports</a></li>
-            <li><a href="/Entertainment">Entertainment</a></li>
-            <li><a href="/Business">Business</a></li>
-            <li><a href="/Beauty">Beauty</a></li>
-            <li><a href="/Health">Health</a></li>
-            <li><a href="/Arts and Culture">Arts & Culture</a></li>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/news/technology">Technology</Link></li>
+            <li><Link to="/news/science">Science</Link></li>
+            <li><Link to="/news/sports">Sports</Link></li>
+            <li><Link to="/news/entertainment">Entertainment</Link></li>
+            <li><Link to="/news/business">Business</Link></li>
+            <li><Link to="/news/beauty">Beauty</Link></li>
+            <li><Link to="/news/health">Health</Link></li>
+            <li><Link to="/news/arts-culture">Arts & Culture</Link></li>
           </ul>
         </nav>
         <div className={`search-icon ${searchActive ? 'active' : ''}`} onClick={handleSearchClick}>

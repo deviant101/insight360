@@ -8,6 +8,7 @@ import './App.css';
 import NewsList from './components/NewsList';
 import VideoGallery from './components/VideoGallery';
 import NewsPage from './components/NewsPage';
+import SignUp from './components/SignUp';
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
               <NewsList category="Science" count={4} />
             </>
           } />
-          <Route path="/:category" element={<NewsPage count={8} />} />
+          <Route path="/news/:category" element={<NewsPage count={8} />} />
+          <Route path="/signup" element={<SignUp />} />
           {/* Add more routes as needed */}
         </Routes>
         <Newsletter />

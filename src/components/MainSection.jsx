@@ -1,65 +1,78 @@
-// MainSection.js
-import React from 'react';
+// FILE: src/components/MainSection.jsx
+import React, { useEffect, useState } from 'react';
 import './MainSection.css';
 
 const MainSection = () => {
+    const [featuredArticle, setFeaturedArticle] = useState(null);
+    const [sideArticles, setSideArticles] = useState([]);
+    const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+
+    // Function to shuffle an array
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    };
+
+    useEffect(() => {
+        const fetchArticles = async () => {
+            try {
+                const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`);
+                const data = await response.json();
+                if (data.articles && data.articles.length > 0) {
+                    // Filter out articles with missing content
+                    const filteredArticles = data.articles.filter(article =>
+                        article.urlToImage && article.title && article.description && article.author && article.source.name
+                    );
+                    const shuffledArticles = shuffleArray(filteredArticles);
+                    setFeaturedArticle(shuffledArticles[0]); // Assuming the first article is the featured one
+                    setSideArticles(shuffledArticles.slice(1, 4)); // The next 3 articles are side articles
+                } else {
+                    console.error('No articles found in the response');
+                }
+            } catch (error) {
+                console.error('Error fetching articles:', error);
+            }
+        };
+
+        fetchArticles();
+    }, [apiKey]);
+
     return (
         <section className="main-section">
-            <div className="featured-article">
-                <img
-                    src="https://s.yimg.com/ny/api/res/1.2/h9jln2vOKlO_30MlTGbSZQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD02MDA-/https://media.zenfs.com/en/the_wall_street_journal_hosted_996/9e44f91cd324acd17b861b21a141629f" // Replace with the actual featured image
-                    alt="Featured Article"
-                    className="featured-image"
-                />
-                <div className="featured-content">
-                    <h2 className="featured-category">Technology</h2>
-                    <h1 className="featured-title">
-                        Boeing’s CEO Is Shrinking the Jet Maker to Stop Its Crisis From Spiraling
-                    </h1>
-                    <p>Warner Bros. Discovery and the NBA have settled their lawsuit with Disney agreeing to license the TNT show "Inside the NBA" to ESPN and ABC starting next season the key point of the agreement.\nWBD's digital platforms, Bleacher Report and House of Highlights, …</p>
-                    <p className="featured-author">by Sharon Terlep</p>
+            {featuredArticle && (
+                <div className="featured-article">
+                    <img
+                        src={featuredArticle.urlToImage}
+                        alt="Featured Article"
+                        className="featured-image"
+                    />
+                    <div className="featured-content">
+                        <h2 className="featured-category">{featuredArticle.source.name}</h2>
+                        <h1 className="featured-title">{featuredArticle.title}</h1>
+                        <p>{featuredArticle.description}</p>
+                        <p className="featured-author">by {featuredArticle.author}</p>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="side-articles">
-                <div className="side-article">
-                    <img
-                        src="https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/3626b2f498f270e7b29735125475956a.jpg" // Replace with actual image
-                        alt="Side Article 1"
-                        className="side-article-image"
-                    />
-                    <div className="side-article-content">
-                        <h3 className="side-category">Technology</h3>
-                        <h2 className="side-title">The Dow drops 250 points as McDonald's stock slumps with Tesla earnings up next</h2>
-                        <p className="side-author">by Vinamrata Chaturvedi</p>
+                {sideArticles.map((article, index) => (
+                    <div className="side-article" key={index}>
+                        <img
+                            src={article.urlToImage}
+                            alt={`Side Article ${index + 1}`}
+                            className="side-article-image"
+                        />
+                        <div className="side-article-content">
+                            <h3 className="side-category">{article.source.name}</h3>
+                            <h2 className="side-title">{article.title}</h2>
+                            <p className="side-author">by {article.author}</p>
+                        </div>
                     </div>
-                </div>
-
-                <div className="side-article">
-                    <img
-                        src="https://www.reuters.com/resizer/v2/LGMX3DVNZNLGVN3IH766SRCNPI.jpg?auth=5bf3fecf3659696fa0c55ec601912d9e09344d68396ccbf6841093f52fcd55e6&height=1005&width=1920&quality=80&smart=true" // Replace with actual image
-                        alt="Side Article 2"
-                        className="side-article-image"
-                    />
-                    <div className="side-article-content">
-                        <h3 className="side-category">Politics</h3>
-                        <h2 className="side-title">Headwinds hit Trump-fueled rally in US stocks - Reuters</h2>
-                        <p className="side-author">by Lewis Krauskopf</p>
-                    </div>
-                </div>
-
-                <div className="side-article">
-                    <img
-                        src="https://media.zenfs.com/en/reuters-finance.com/4b0a577a71f33983c6caeef5cb387342" // Replace with actual image
-                        alt="Side Article 3"
-                        className="side-article-image"
-                    />
-                    <div className="side-article-content">
-                        <h3 className="side-category">Technology</h3>
-                        <h2 className="side-title">Shares rise ahead of Nvidia results; BOJ keeps rates markets guessing - Yahoo Finance</h2>
-                        <p className="side-author">by Samuel Indyk and Rae Wee</p>
-                    </div>
-                </div>
+                ))}
             </div>
         </section>
     );

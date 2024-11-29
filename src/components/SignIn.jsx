@@ -1,21 +1,41 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './SignIn.css';
 
 const SignIn = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/auth/login', { email, password });
+            localStorage.setItem('userInfo', JSON.stringify(response.data));
+            navigate('/');
+        } catch (error) {
+            setError(error.response.data.message || 'An error occurred');
+        }
+    };
+
     return (
         <div className="signin-container">
             <div className="signin-card">
                 <h2 className="signin-title">Sign In</h2>
                 <p className="signin-subtitle">Enter Login details to get access</p>
-                <form className="signin-form">
+                {error && <p className="error-message">{error}</p>}
+                <form className="signin-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="fullName">Username Or Email Address</label>
+                        <label htmlFor="email">Email Address</label>
                         <input
-                            type="text"
-                            id="fullName"
-                            name="fullName"
-                            placeholder="Enter Full Name"
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter Email Address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -26,6 +46,8 @@ const SignIn = () => {
                             id="password"
                             name="password"
                             placeholder="Enter Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                         />
                     </div>

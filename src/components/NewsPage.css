@@ -52,6 +52,13 @@
     width: 411px;
     height: 380px;
     text-align: left;
+    text-decoration: none;
+    color: inherit;
+}
+
+.news-item:hover {
+    text-decoration: none;
+    color: inherit;
 }
 
 .image-container {

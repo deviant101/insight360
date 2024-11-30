@@ -40,7 +40,7 @@ const NewsList = ({ category, count }) => {
       </div>
       <div className="news-items">
         {articles.map((article, index) => (
-          <div key={index} className="news-item">
+          <a key={index} href={article.url} target="_blank" rel="noopener noreferrer" className="news-item">
             <div className="image-container">
               <img src={article.urlToImage} alt={article.title} />
             </div>
@@ -49,7 +49,7 @@ const NewsList = ({ category, count }) => {
               <h3 className="title">{article.title}</h3>
               <p className="author">by {article.author}</p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

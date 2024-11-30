@@ -17,6 +17,18 @@
     /* background-color: aquamarine; */
 }
 
+.featured-article,
+.side-article {
+    text-decoration: none;
+    color: inherit;
+}
+
+.featured-article:hover,
+.side-article:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
 .featured-image {
     width: 1000px;
     height: 500px;

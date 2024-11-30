@@ -43,7 +43,7 @@ const MainSection = () => {
     return (
         <section className="main-section">
             {featuredArticle && (
-                <div className="featured-article">
+                <a href={featuredArticle.url} target="_blank" rel="noopener noreferrer" className="featured-article">
                     <img
                         src={featuredArticle.urlToImage}
                         alt="Featured Article"
@@ -55,12 +55,12 @@ const MainSection = () => {
                         <p>{featuredArticle.description}</p>
                         <p className="featured-author">by {featuredArticle.author}</p>
                     </div>
-                </div>
+                </a>
             )}
 
             <div className="side-articles">
                 {sideArticles.map((article, index) => (
-                    <div className="side-article" key={index}>
+                    <a key={index} href={article.url} target="_blank" rel="noopener noreferrer" className="side-article">
                         <img
                             src={article.urlToImage}
                             alt={`Side Article ${index + 1}`}
@@ -71,7 +71,7 @@ const MainSection = () => {
                             <h2 className="side-title">{article.title}</h2>
                             <p className="side-author">by {article.author}</p>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
         </section>

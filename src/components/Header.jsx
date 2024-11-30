@@ -21,6 +21,7 @@ const Header = () => {
             <div className="top-row">
                 <div className="logo">
                     <img src={require('../assets/logo.png')} alt="Insight360 Logo" />
+                    <span className="site-name">Insight360</span>
                 </div>
                 <div className="header-right">
                     {user ? (
@@ -50,9 +51,7 @@ const Header = () => {
                         <li><Link to="/Sports">Sports</Link></li>
                         <li><Link to="/Entertainment">Entertainment</Link></li>
                         <li><Link to="/Business">Business</Link></li>
-                        <li><Link to="/Beauty">Beauty</Link></li>
                         <li><Link to="/Health">Health</Link></li>
-                        <li><Link to="/Arts-culture">Arts & Culture</Link></li>
                     </ul>
                 </nav>
                 <div className={`search-icon ${searchActive ? 'active' : ''}`} onClick={handleSearchClick}>

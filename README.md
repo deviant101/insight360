@@ -1,70 +1,161 @@
-# Getting Started with Create React App
+# Insight360
+Insight360 is a news website that provides the latest updates on various topics including technology, science, sports, entertainment, business, and health. The website features a video gallery, news articles, and a newsletter subscription.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Table of Contents
 
-## Available Scripts
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Running the Project](#running-the-project)
+- [API Endpoints](#api-endpoints)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- Display latest news articles by category
+- Video gallery with featured and other videos
+- User authentication (Sign Up, Sign In)
+- Newsletter subscription
+- Responsive design
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project Structure
+The project structure is as follows:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+insight360/
+├── backend/
+│   ├── controllers/
+│   │   └── authController.js
+│   ├── models/
+│   │   └── User.js
+│   ├── routes/
+│   │   └── authRoutes.js
+│   ├── .env
+│   ├── .gitignore
+│   ├── docker-compose.yml
+│   ├── package.json
+│   └── server.js
+├── frontend/
+│   ├── public/
+│   │   ├── index.html
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   │   ├── Footer.css
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Header.css
+│   │   │   ├── Header.jsx
+│   │   │   ├── MainSection.css
+│   │   │   ├── MainSection.jsx
+│   │   │   ├── Newsletter.css
+│   │   │   ├── Newsletter.jsx
+│   │   │   ├── NewsList.css
+│   │   │   ├── NewsList.jsx
+│   │   │   ├── SearchArticle.css
+│   │   │   ├── SearchArticle.jsx
+│   │   │   ├── SignIn.css
+│   │   │   ├── SignIn.jsx
+│   │   │   ├── SignUp.css
+│   │   │   ├── SignUp.jsx
+│   │   │   ├── VideoGallery.css
+│   │   │   └── VideoGallery.jsx
+│   │   ├── context/
+│   │   │   └── AuthContext.js
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── App.test.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── reportWebVitals.js
+│   │   └── setupTests.js
+│   ├── .env
+│   └── package.json
+├── .gitignore
+└── README.md
+```
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/your-username/insight360.git
+    cd insight360
+    ```
 
-### `npm run build`
+2. Install dependencies for the frontend:
+    ```sh
+    cd frontend
+    npm install
+    ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Install dependencies for the backend:
+    ```sh
+    cd backend
+    npm install
+    ```
+## Environment Variables
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Create a `.env` file in the `backend` directory and add the following environment variables:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```sh
+MONGO_URI=<your-mongodb-uri>
+JWT_SECRET=<your-jwt-secret>
+PORT=5000
+```
 
-### `npm run eject`
+Create a `.env` file in the `frontend` directory and add the following environment variables:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```sh
+REACT_APP_NEWS_KEY=<your-news-api-key>
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Running the Project
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. Start the backend server:
+    ```sh
+    cd backend
+    npm start
+    ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2. Start the frontend development server:
+    ```sh
+    cd frontend
+    npm start
+    ```
 
-## Learn More
+3. Open your browser and navigate to `http://localhost:3000`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## API Endpoints
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Authentication
 
-### Code Splitting
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login a user
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Technologies Used
 
-### Analyzing the Bundle Size
+- Frontend:
+  - React
+  - Axios
+  - React Router DOM
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- Backend:
+  - Node.js
+  - Express
+  - MongoDB
+  - Mongoose
+  - JWT (JSON Web Token)
+  - bcrypt
 
-### Making a Progressive Web App
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
 
-### Advanced Configuration
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the [MIT License](LICENSE).

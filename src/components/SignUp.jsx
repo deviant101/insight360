@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+// src/components/SignUp.jsx
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import './SignUp.css';
 
 const SignUp = () => {
@@ -9,19 +11,19 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/register', { fullName, email, password });
             if (response && response.data) {
-                localStorage.setItem('userInfo', JSON.stringify(response.data));
+                login(response.data);
                 navigate('/');
             } else {
                 setError('Registration failed. Please try again.');
             }
         } catch (error) {
-            console.error('Error during registration:', error);
             setError(error.response?.data?.message || 'An error occurred');
         }
     };

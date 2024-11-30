@@ -83,24 +83,50 @@
 }
 
 .search-icon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.search-input {
+  display: none;
+  margin-left: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-icon.active .search-input,
+.search-input:focus {
+  display: block;
+}
+
+.search-icon {
   position: relative;
   cursor: pointer;
-  display: flex; /* Ensures proper alignment of icon and input */
-  align-items: center; /* Vertically aligns icon and input */
-  transition: transform 0.3s ease; /* Add transition for smooth movement */
+  display: flex;
+  /* Ensures proper alignment of icon and input */
+  align-items: center;
+  /* Vertically aligns icon and input */
+  transition: transform 0.3s ease;
+  /* Add transition for smooth movement */
 }
 
 .search-icon i {
   font-size: 18px;
   color: black;
   transition: opacity 0.3s ease;
-  z-index: 2; /* Ensure icon is above input when transitioning */
+  z-index: 2;
+  /* Ensure icon is above input when transitioning */
 }
 
 .search-input {
-  border: none; /* Remove default border */
-  border-bottom: 2px solid red; /* Add red underline border */
-  border-radius: 0; /* Make it fully squared */
+  border: none;
+  /* Remove default border */
+  border-bottom: 2px solid red;
+  /* Add red underline border */
+  border-radius: 0;
+  /* Make it fully squared */
   padding: 5px 10px;
   font-size: 14px;
   outline: none;
@@ -111,23 +137,43 @@
   position: relative;
   left: 0;
   top: 0;
-  transform: translateX(0); /* Initial position */
+  transform: translateX(0);
+  /* Initial position */
   transition: all 0.3s ease;
 
-  background-color: white; /* White background */
-  color: black; /* Initial text color - changed to black */
+  background-color: white;
+  /* White background */
+  color: black;
+  /* Initial text color - changed to black */
 }
 
-.search-input:focus, /* Animate on focus/typing */
+.search-input:focus,
+/* Animate on focus/typing */
 .search-input.active {
   width: 200px;
   opacity: 1;
-  color: black; /* Text color when active - changed to black */
-  transform: translateX(0px); /* Move input to the left by half */
+  color: black;
+  /* Text color when active - changed to black */
+  transform: translateX(0px);
+  /* Move input to the left by half */
 }
-
 
 .search-icon.active i {
   opacity: 0;
 }
 
+.logout-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #ff1a1a;
+}

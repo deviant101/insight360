@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+// src/components/SignIn.jsx
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import './SignIn.css';
 
 const SignIn = () => {
@@ -8,15 +10,20 @@ const SignIn = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/login', { email, password });
-            localStorage.setItem('userInfo', JSON.stringify(response.data));
-            navigate('/');
+            if (response && response.data) {
+                login(response.data);
+                navigate('/');
+            } else {
+                setError('Login failed. Please try again.');
+            }
         } catch (error) {
-            setError(error.response.data.message || 'An error occurred');
+            setError(error.response?.data?.message || 'An error occurred');
         }
     };
 

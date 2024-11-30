@@ -1,12 +1,14 @@
 // src/components/Header.jsx
 import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import './Header.css';
 
 const Header = () => {
     const { user, logout } = useContext(AuthContext);
     const [searchActive, setSearchActive] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
 
     const handleSearchClick = () => {
         setSearchActive(!searchActive);
@@ -14,6 +16,13 @@ const Header = () => {
 
     const handleSearchBlur = () => {
         setSearchActive(false);
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?q=${searchQuery}`);
+        }
     };
 
     return (
@@ -56,13 +65,17 @@ const Header = () => {
                 </nav>
                 <div className={`search-icon ${searchActive ? 'active' : ''}`} onClick={handleSearchClick}>
                     <i className="fas fa-search"></i>
-                    <input
-                        type="text"
-                        className={`search-input ${searchActive ? 'active' : ''}`}
-                        placeholder="Search..."
-                        onBlur={handleSearchBlur}
-                        onFocus={() => setSearchActive(true)}
-                    />
+                    <form onSubmit={handleSearchSubmit}>
+                        <input
+                            type="text"
+                            className={`search-input ${searchActive ? 'active' : ''}`}
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onBlur={handleSearchBlur}
+                            onFocus={() => setSearchActive(true)}
+                        />
+                    </form>
                 </div>
             </div>
         </header>

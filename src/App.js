@@ -10,6 +10,7 @@ import VideoGallery from './components/VideoGallery';
 import NewsPage from './components/NewsPage';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
+import SearchArticle from './components/SearchArticle';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/:category" element={<NewsPage count={8} />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/search" element={<SearchArticle />} />
           {/* Add more routes as needed */}
         </Routes>
         <Newsletter />

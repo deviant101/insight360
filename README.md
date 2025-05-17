@@ -83,7 +83,7 @@ insight360/
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-username/insight360.git
+    git clone https://github.com/deviant101/insight360.git
     cd insight360
     ```
 
@@ -112,6 +112,11 @@ Create a `.env` file in the `frontend` directory and add the following environme
 
 ```sh
 REACT_APP_NEWS_KEY=<your-news-api-key>
+```
+
+Create a .env file in your project root with the following:
+```sh
+REACT_APP_NEWS_API_KEY=<your_news_api_key_here>
 ```
 
 ## Running the Project

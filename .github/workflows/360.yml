@@ -17,6 +17,17 @@ jobs:
           node-version: 18
           cache: 'npm'
 
+     # Cache node modules
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       # Frontend setup and testing
       - name: Install frontend dependencies
         run: npm install
@@ -35,25 +46,8 @@ jobs:
           path: |
             build
             !build/**/*.md
+      - name: starting the npm
+        run: npm start 
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+     
         
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-          path: build
-          
-      # # Basic GitHub Pages deployment
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build
-          branch: gh-pages
-          clean: true

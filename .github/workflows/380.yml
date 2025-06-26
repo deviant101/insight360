@@ -34,20 +34,20 @@ jobs:
             build
             !build/**/*.md
 
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+  # deploy:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref != 'refs/heads/main'
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
         
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-          path: build
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: build-files
+  #         path: build
 
   docker-push:
     needs: build-and-test
@@ -69,11 +69,11 @@ jobs:
         with:
           context: .
           push: false
-          tags: ${{env.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
 
       - name: Test Docker image 
         run: |
-          docker run -d --name test-container -p 3000:3000 ${{env.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+          docker run -d --name test-container -p 3000:3000 ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
           sleep 10
           docker ps -a
           docker logs test-container

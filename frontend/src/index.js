@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client';
 import axios from 'axios';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 import AuthProvider from './context/AuthContext';
 
 // Set the base URL for Axios
@@ -18,5 +17,3 @@ root.render(
     </AuthProvider>
   </React.StrictMode>
 );
-
-reportWebVitals();

@@ -1,40 +1,37 @@
 {
-  "name": "news-website",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.7.7",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
+  "name": "insight360",
+  "version": "1.0.0",
+  "description": "A news website providing latest updates on various topics",
+  "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "install": "npm install --prefix frontend && npm install --prefix backend",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm start --prefix backend",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
+    "server:dev": "npm run dev --prefix backend",
+    "build": "npm run build --prefix frontend",
+    "test": "npm test --prefix frontend",
+    "docker:db": "docker-compose up -d mongodb",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f mongodb",
+    "setup": "./setup-dev.sh"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "keywords": [
+    "news",
+    "website",
+    "react",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Farrukh Riaz",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deviant101/insight360.git"
   }
 }

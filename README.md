@@ -140,6 +140,22 @@ REACT_APP_API_URL=http://localhost:5000
 
 ### Development Mode
 
+**Prerequisites: Start MongoDB First**
+
+Before running the backend, make sure MongoDB is running:
+
+**Option 1: Using Docker (Recommended)**
+```bash
+npm run docker:db
+# OR
+docker-compose up -d mongodb
+```
+
+**Option 2: Local MongoDB Installation**
+- Make sure MongoDB is installed and running locally on `mongodb://localhost:27017`
+
+**Then start the application:**
+
 **Option 1: Run both frontend and backend together**
 ```bash
 npm start
@@ -147,7 +163,7 @@ npm start
 
 **Option 2: Run them separately**
 
-Backend:
+Backend (after MongoDB is running):
 ```bash
 cd backend
 npm run dev  # Uses nodemon for auto-restart
@@ -161,20 +177,18 @@ npm start
 
 ### Production Mode
 
-Build the frontend:
-```bash
-npm run build
-```
+1. **Start MongoDB** (Docker or local installation)
+2. **Build the frontend:**
+   ```bash
+   npm run build
+   ```
+3. **Start the backend:**
+   ```bash
+   cd backend
+   npm start
+   ```
 
-Start the backend:
-```bash
-cd backend
-npm start
-```
-
-### Using Docker (MongoDB)
-
-The easiest way to get MongoDB running for development:
+### Docker Commands for MongoDB
 
 **Start MongoDB:**
 ```bash
@@ -192,12 +206,6 @@ npm run docker:logs
 ```bash
 npm run docker:down
 ```
-
-### Manual MongoDB Installation
-
-If you prefer not to use Docker, install MongoDB locally:
-- [MongoDB Community Server](https://www.mongodb.com/try/download/community)
-- Make sure it's running on `mongodb://localhost:27017`
 
 ## API Endpoints
 

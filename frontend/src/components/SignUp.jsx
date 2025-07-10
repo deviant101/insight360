@@ -16,7 +16,10 @@ const SignUp = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log('Making request to:', '/api/auth/register');
+            console.log('Request data:', { fullName, email, password });
             const response = await axios.post('/api/auth/register', { fullName, email, password });
+            console.log('Response:', response);
             if (response && response.data) {
                 login(response.data);
                 navigate('/');
@@ -24,6 +27,8 @@ const SignUp = () => {
                 setError('Registration failed. Please try again.');
             }
         } catch (error) {
+            console.error('Error details:', error);
+            console.error('Error response:', error.response);
             setError(error.response?.data?.message || 'An error occurred');
         }
     };

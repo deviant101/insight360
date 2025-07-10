@@ -1,6 +1,6 @@
 # Insight360
 
-Insight360 is a modern news website that provides the latest updates on various topics including technology, science, sports, entertainment, business, and health. The website features a video gallery, news articles, user authentication, and a newsletter subscription.
+Insight360 is a modern, full-stack news website that provides the latest updates on various topics including technology, science, sports, entertainment, business, and health. The website features a responsive design, video gallery, news articles with search functionality, user authentication system, and newsletter subscription.
 
 ## Table of Contents
 
@@ -16,13 +16,20 @@ Insight360 is a modern news website that provides the latest updates on various 
 
 ## Features
 
-- 📰 Display latest news articles by category
-- 🎥 Video gallery with featured and other videos
-- 🔐 User authentication (Sign Up, Sign In)
-- 📧 Newsletter subscription
-- 🔍 Search functionality
-- 📱 Responsive design
-- 🎨 Modern UI/UX
+- 📰 **Dynamic News Display** - Latest news articles by category (Technology, Science, Sports, Entertainment, Business, Health)
+- 🎥 **Video Gallery** - Curated video content with featured videos and thumbnails
+- 🔐 **User Authentication** - Complete registration and login system with JWT tokens
+- 📧 **Newsletter Subscription** - Email subscription with responsive input form
+- 🔍 **Advanced Search** - Search functionality across all news articles
+- 📱 **Responsive Design** - Mobile-friendly interface with modern styling
+- 🎨 **Modern UI/UX** - Clean design with hover effects and smooth animations
+- 🏠 **Homepage Hero Section** - Featured article display with side articles
+- 🔄 **Real-time Updates** - Live news feeds from NewsAPI
+- 🌐 **Social Media Integration** - Social media links and sharing capabilities
+- 📊 **Context Management** - React Context for state management
+- 🔒 **Secure Backend** - Password hashing and JWT authentication
+- 🐳 **Docker Support** - Containerized MongoDB setup
+- 🎯 **Category Navigation** - Easy navigation between different news categories
 
 ## Project Structure
 
@@ -36,20 +43,33 @@ insight360/
 │   │   └── robots.txt
 │   ├── src/
 │   │   ├── assets/           # Images and static assets
+│   │   │   ├── logo.png
+│   │   │   └── logo-2.png
 │   │   ├── components/       # React components
 │   │   │   ├── Footer.jsx
+│   │   │   ├── Footer.css
 │   │   │   ├── Header.jsx
+│   │   │   ├── Header.css
 │   │   │   ├── MainSection.jsx
+│   │   │   ├── MainSection.css
 │   │   │   ├── Newsletter.jsx
+│   │   │   ├── Newsletter.css
 │   │   │   ├── NewsList.jsx
+│   │   │   ├── NewsList.css
 │   │   │   ├── NewsPage.jsx
+│   │   │   ├── NewsPage.css
 │   │   │   ├── SearchArticle.jsx
+│   │   │   ├── SearchArticle.css
 │   │   │   ├── SignIn.jsx
+│   │   │   ├── SignIn.css
 │   │   │   ├── SignUp.jsx
-│   │   │   └── VideoGallery.jsx
+│   │   │   ├── SignUp.css
+│   │   │   ├── VideoGallery.jsx
+│   │   │   └── VideoGallery.css
 │   │   ├── context/          # React context for state management
 │   │   │   └── AuthContext.js
 │   │   ├── App.js
+│   │   ├── App.css
 │   │   ├── index.js
 │   │   └── index.css
 │   ├── .env.example
@@ -64,12 +84,13 @@ insight360/
 │   │   └── authRoutes.js
 │   ├── .env.example
 │   ├── .gitignore
-│   ├── docker-compose.yml
+│   ├── mongo-init.js        # MongoDB initialization script
 │   ├── package.json
 │   └── server.js
 ├── .gitignore
 ├── LICENSE
-├── package.json             # Root package.json for managing both frontend and backend
+├── docker-compose.yml       # Docker configuration for MongoDB
+├── insight360.code-workspace # VSCode workspace configuration
 └── README.md
 ```
 
@@ -88,17 +109,36 @@ insight360/
    cd insight360
    ```
 
-2. **Install all dependencies:**
+2. **Install dependencies for both frontend and backend:**
    ```bash
-   npm run install
+   # Install backend dependencies
+   cd backend
+   npm install
+   
+   # Install frontend dependencies
+   cd ../frontend
+   npm install
    ```
 
 3. **Set up environment variables:**
    - Copy `.env.example` to `.env` in both `frontend` and `backend` directories
    - Fill in your actual values
 
-4. **Start both frontend and backend:**
+4. **Start MongoDB using Docker:**
    ```bash
+   # From the root directory
+   docker-compose up -d mongodb
+   ```
+
+5. **Start the backend server:**
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+6. **Start the frontend application:**
+   ```bash
+   cd frontend
    npm start
    ```
 
@@ -122,15 +162,32 @@ If you prefer to install and run each part separately:
 
 ### Backend (`backend/.env`)
 ```env
-MONGO_URI=mongodb://localhost:27017/insight360
-JWT_SECRET=your_super_secret_jwt_key_here
+# MongoDB connection string
+# For local development with Docker
+MONGO_URI=mongodb://root:example@localhost:27017/insight360?authSource=admin
+
+# Alternative: Using the created application user
+# MONGO_URI=mongodb://insight360_user:insight360_pass@localhost:27017/insight360
+
+# For production (replace with your actual MongoDB URI)
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/insight360?retryWrites=true&w=majority
+
+# JWT Secret for authentication
+JWT_SECRET=7f4e0a86bcd844b89a8c62e1c235bc42f0e7e0e279b54688b08f9b2dc85d8ab0
+
+# Server port
 PORT=5000
+
+# Node environment
 NODE_ENV=development
 ```
 
 ### Frontend (`frontend/.env`)
 ```env
+# News API Key from https://newsapi.org/
 REACT_APP_NEWS_API_KEY=your_news_api_key_here
+
+# Backend API URL (for production)
 REACT_APP_API_URL=http://localhost:5000
 ```
 
@@ -146,8 +203,6 @@ Before running the backend, make sure MongoDB is running:
 
 **Option 1: Using Docker (Recommended)**
 ```bash
-npm run docker:db
-# OR
 docker-compose up -d mongodb
 ```
 
@@ -156,20 +211,13 @@ docker-compose up -d mongodb
 
 **Then start the application:**
 
-**Option 1: Run both frontend and backend together**
-```bash
-npm start
-```
-
-**Option 2: Run them separately**
-
 Backend (after MongoDB is running):
 ```bash
 cd backend
 npm run dev  # Uses nodemon for auto-restart
 ```
 
-Frontend:
+Frontend (in a separate terminal):
 ```bash
 cd frontend
 npm start
@@ -180,6 +228,7 @@ npm start
 1. **Start MongoDB** (Docker or local installation)
 2. **Build the frontend:**
    ```bash
+   cd frontend
    npm run build
    ```
 3. **Start the backend:**
@@ -192,19 +241,22 @@ npm start
 
 **Start MongoDB:**
 ```bash
-npm run docker:db
-# OR
 docker-compose up -d mongodb
 ```
 
 **Check MongoDB logs:**
 ```bash
-npm run docker:logs
+docker-compose logs mongodb
 ```
 
 **Stop MongoDB:**
 ```bash
-npm run docker:down
+docker-compose down
+```
+
+**Access MongoDB shell:**
+```bash
+docker exec -it insight360-mongodb mongosh --username root --password example --authenticationDatabase admin
 ```
 
 ## API Endpoints
@@ -238,6 +290,18 @@ Content-Type: application/json
 }
 ```
 
+### Frontend Routes
+- `/` - Homepage with featured articles, news lists, and video gallery
+- `/technology` - Technology news category page
+- `/science` - Science news category page
+- `/sports` - Sports news category page
+- `/entertainment` - Entertainment news category page
+- `/business` - Business news category page
+- `/health` - Health news category page
+- `/signin` - User login page
+- `/signup` - User registration page
+- `/search?q=query` - Search results page
+
 ## Technologies Used
 
 ### Frontend
@@ -245,6 +309,7 @@ Content-Type: application/json
 - **React Router DOM** - Routing for React applications
 - **Axios** - HTTP client for API requests
 - **CSS3** - Styling and responsive design
+- **FontAwesome** - Icon library for social media and UI icons
 
 ### Backend
 - **Node.js** - JavaScript runtime environment
@@ -253,27 +318,54 @@ Content-Type: application/json
 - **Mongoose** - MongoDB object modeling
 - **JWT** - JSON Web Tokens for authentication
 - **bcrypt** - Password hashing
+- **CORS** - Cross-origin resource sharing middleware
 
 ### External APIs
-- **NewsAPI** - For fetching news articles
-- **YouTube** - For video content (embedded)
+- **NewsAPI** - For fetching news articles ([Get API Key](https://newsapi.org/))
+- **YouTube** - For video content (embedded videos)
+
+### Development Tools
+- **Docker** - For MongoDB containerization
+- **Nodemon** - For backend development auto-reload
+- **VS Code** - Recommended IDE with workspace configuration
 
 ## Development Scripts
 
-### Root Level
-- `npm run install` - Install dependencies for both frontend and backend
-- `npm start` - Start both frontend and backend concurrently
-- `npm run dev` - Start both in development mode
-- `npm run build` - Build frontend for production
+### Root Level (Manual Commands)
+Since there's no root-level package.json, run these commands in separate terminals:
 
-### Frontend
-- `npm start` - Start development server
+**Start MongoDB:**
+```bash
+# Start MongoDB using Docker
+docker-compose up -d mongodb
+```
+
+**Start Backend:**
+```bash
+cd backend
+npm install  # First time only
+npm run dev  # Development with auto-reload
+# OR
+npm start    # Production mode
+```
+
+**Start Frontend:**
+```bash
+cd frontend
+npm install  # First time only
+npm start    # Development server
+```
+
+### Frontend Scripts
+- `npm start` - Start React development server (runs on http://localhost:3000)
 - `npm run build` - Build for production
 - `npm test` - Run tests
+- `npm run eject` - Eject from Create React App
 
-### Backend
+### Backend Scripts
 - `npm start` - Start production server
-- `npm run dev` - Start development server with nodemon
+- `npm run dev` - Start development server with nodemon (auto-reload)
+- `npm test` - Run tests (placeholder)
 
 ## Contributing
 

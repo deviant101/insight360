@@ -7,7 +7,7 @@ import App from './App';
 import AuthProvider from './context/AuthContext';
 
 // Set the base URL for Axios
-axios.defaults.baseURL = 'http://localhost:5000'; // Adjust the URL as needed
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

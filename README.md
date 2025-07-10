@@ -188,7 +188,7 @@ NODE_ENV=development
 REACT_APP_NEWS_API_KEY=your_news_api_key_here
 
 # Backend API URL (for production)
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://YOUR_VM_IP:5000
 ```
 
 > **Note:** Get your News API key from [NewsAPI.org](https://newsapi.org/)

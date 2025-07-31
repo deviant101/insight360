@@ -35,64 +35,123 @@ jobs:
             !build/**/*.md
 
 # Docker push and vulnerability scanning
-  docker-push:
-    needs: build-and-test
+  # docker-push:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ vars.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  #     - name: Build Docker image
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: false
+  #         tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+  #         load: true
+
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+  #         format: 'sarif'
+  #         output: 'trivy-results.sarif'
+
+  #     - name: Upload Trivy scan results to GitHub Security tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       if: always()
+  #       with:
+  #         sarif_file: 'trivy-results.sarif'
+
+      # - name: Run Trivy vulnerability scanner (table format)
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+      #     format: 'table'
+      #     exit-code: '1'
+      #     ignore-unfixed: true
+      #     vuln-type: 'os,library'
+      #     severity: 'CRITICAL,HIGH'
+
+      # - name: Push Docker image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+
+      # - name: Test Docker image 
+      #   run: |
+      #     docker run -d --name test-container -p 3000:3000 ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+      #     sleep 10
+      #     docker ps -a
+      #     docker logs test-container
+      #     # Optionally, check if the container is running and healthy
+      #     docker inspect --format='{{.State.Running}}' test-container | grep true
+
+  # Deploy to Azure VM
+  deploy-to-azure:
+    # needs: docker-push
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/master' # Only deploy from master branch
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          port: 22
+          script: |
+            # Stop and remove existing container if running
+            docker stop insight360-frontend || true
+            docker rm insight360-frontend || true
+            
+            # Remove old image
+            docker rmi ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest || true
+            
+            # Pull latest image
+            docker pull ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest
+            
+            # Run new container
+            docker run -d \
+              --name insight360-frontend \
+              --restart unless-stopped \
+              -p 80:3000 \
+              ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest
+            
+            # Verify deployment
+            sleep 10
+            docker ps | grep insight360-frontend
+            
+            # Optional: Check if application is responding
+            curl -f http://localhost:80 || echo "Application might still be starting up"
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
+      - name: Verify Deployment
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          context: .
-          push: false
-          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
-          load: true
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-      - name: Run Trivy vulnerability scanner (table format)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
-
-      - name: Test Docker image 
-        run: |
-          docker run -d --name test-container -p 3000:3000 ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
-          sleep 10
-          docker ps -a
-          docker logs test-container
-          # Optionally, check if the container is running and healthy
-          docker inspect --format='{{.State.Running}}' test-container | grep true
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          port: 22
+          script: |
+            # Check container status
+            echo "Container status:"
+            docker ps -a | grep insight360-frontend
+            
+            # Check container logs
+            echo "Recent container logs:"
+            docker logs --tail 20 insight360-frontend
+            
+            # Check if port is listening
+            echo "Port status:"
+            netstat -tlnp | grep :80 || echo "Port 80 not yet available"

@@ -1,72 +1,64 @@
-services:
-  # MongoDB Database
-  mongodb:
-    image: mongo:7-jammy
-    container_name: insight360-mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-example}
-      MONGO_INITDB_DATABASE: insight360
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - insight360-network
-    healthcheck:
-      test: ["CMD-SHELL", "echo 'db.runCommand({ping: 1})' | mongosh --quiet || echo 'db.runCommand({ping: 1})' | mongo --quiet"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+version: '3.8'
 
-  # Backend API
-  backend:
-    image: ${DOCKERHUB_USERNAME}/insight360-backend:${IMAGE_TAG:-latest}
-    container_name: insight360-backend
+services:
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/insight360-frontend:latest
+    container_name: insight360-frontend
+    ports:
+      - "80:3000"
+    depends_on:
+      - backend
     restart: unless-stopped
+    networks:
+      - app-network
+
+  backend:
+    image: ${DOCKERHUB_USERNAME}/insight360-backend:latest
+    container_name: insight360-backend
     ports:
       - "5000:5000"
     environment:
-      - NODE_ENV=production
-      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-example}@mongodb:27017/insight360?authSource=admin
-      - JWT_SECRET=${JWT_SECRET:-7f4e0a86bcd844b89a8c62e1c235bc42f0e7e0e279b54688b08f9b2dc85d8ab0}
+      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-example}@mongo:27017/insight360?authSource=admin
       - PORT=5000
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongo
+    restart: unless-stopped
     networks:
-      - insight360-network
+      - app-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/api/health || exit 1"]
+      test: ["CMD", "node", "-e", "const http = require('http'); const req = http.request({host:'localhost',port:5000,path:'/health',timeout:2000}, (res) => process.exit(res.statusCode === 200 ? 0 : 1)); req.on('error', () => process.exit(1)); req.end();"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  # Frontend Web App
-  frontend:
-    image: ${DOCKERHUB_USERNAME}/insight360-frontend:${IMAGE_TAG:-latest}
-    container_name: insight360-frontend
-    restart: unless-stopped
+  mongo:
+    image: mongo:7.0-jammy
+    container_name: insight360-mongo
     ports:
-      - "80:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-example}
+      - MONGO_INITDB_DATABASE=insight360
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
     networks:
-      - insight360-network
+      - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
 volumes:
-  mongodb_data:
+  mongo_data:
     driver: local
 
 networks:
-  insight360-network:
+  app-network:
     driver: bridge

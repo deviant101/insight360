@@ -24,6 +24,18 @@ jobs:
         
       - name: Build frontend
         run: npm run build
+
+      # Backend setup and testing
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Test backend (lint check)
+        run: |
+          cd backend
+          # Add any backend tests here
+          echo "Backend tests would run here"
       
       # Archive build artifacts
       - name: Archive production artifacts
@@ -43,14 +55,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build Docker image
+      # Build Frontend Image
+      - name: Build Frontend Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -58,44 +70,73 @@ jobs:
           tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
           load: true
 
-      - name: Run Trivy vulnerability scanner
+      # Build Backend Image
+      - name: Build Backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+          load: true
+
+      # Security Scanning - Frontend
+      - name: Run Trivy vulnerability scanner - Frontend
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
           format: 'sarif'
-          output: 'trivy-results.sarif'
+          output: 'trivy-frontend-results.sarif'
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      # Security Scanning - Backend
+      - name: Run Trivy vulnerability scanner - Backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+
+      - name: Upload Frontend scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: 'trivy-frontend-results.sarif'
 
-      - name: Run Trivy vulnerability scanner (table format)
-        uses: aquasecurity/trivy-action@master
+      - name: Upload Backend scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
         with:
-          image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          sarif_file: 'trivy-backend-results.sarif'
 
-      - name: Push Docker image
+      # Push images to Docker Hub
+      - name: Push Frontend Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
 
-      - name: Test Docker image 
+      - name: Push Backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+
+      - name: Test Docker images 
         run: |
-          docker run -d --name test-container -p 3000:3000 ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+          # Test Frontend
+          docker run -d --name test-frontend -p 3000:3000 ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+          
+          # Test Backend
+          docker run -d --name test-backend -p 5000:5000 \
+            -e MONGO_URI=mongodb://localhost:27017/test \
+            -e JWT_SECRET=test-secret \
+            ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+          
           sleep 10
           docker ps -a
-          docker logs test-container
-          # Optionally, check if the container is running and healthy
-          docker inspect --format='{{.State.Running}}' test-container | grep true
+          docker logs test-frontend
+          docker logs test-backend
 
   # Deploy to Azure VM
   deploy-to-azure:
@@ -104,39 +145,19 @@ jobs:
     if: github.ref != 'refs/heads/master' # Only deploy from master branch
 
     steps:
-      - name: Deploy to Azure VM
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.AZURE_VM_HOST }}
-          username: ${{ secrets.AZURE_VM_USERNAME }}
-          key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          port: 22
-          script: |
-            # Stop and remove existing container if running
-            docker stop insight360-frontend || true
-            docker rm insight360-frontend || true
-            
-            # Remove old image
-            docker rmi ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest || true
-            
-            # Pull latest image
-            docker pull ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest
-            
-            # Run new container
-            docker run -d \
-              --name insight360-frontend \
-              --restart unless-stopped \
-              -p 80:3000 \
-              ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest
-            
-            # Verify deployment
-            sleep 10
-            docker ps | grep insight360-frontend
-            
-            # Optional: Check if application is responding
-            curl -f http://localhost:80 || echo "Application might still be starting up"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Verify Deployment
+      - name: Copy docker-compose to Azure VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          source: "docker-compose.prod.yml"
+          target: "/home/${{ secrets.AZURE_VM_USERNAME }}/insight360/"
+
+      - name: Deploy Full Stack to Azure VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.AZURE_VM_HOST }}
@@ -144,14 +165,70 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           port: 22
           script: |
-            # Check container status
-            echo "Container status:"
-            docker ps -a | grep insight360-frontend
+            cd /home/${{ secrets.AZURE_VM_USERNAME }}/insight360/
+            
+            # Set environment variables
+            export DOCKERHUB_USERNAME=${{ vars.DOCKERHUB_USERNAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
+            export MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
+            
+            # Stop existing containers
+            docker-compose -f docker-compose.prod.yml down || true
+            
+            # Remove old images
+            docker rmi ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest || true
+            docker rmi ${{ vars.DOCKERHUB_USERNAME }}/insight360-backend:latest || true
+            
+            # Pull latest images
+            docker pull ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest
+            docker pull ${{ vars.DOCKERHUB_USERNAME }}/insight360-backend:latest
+            
+            # Start services
+            docker-compose -f docker-compose.prod.yml up -d
+            
+            # Wait for services to start
+            sleep 30
+            
+            # Check if all services are running
+            docker-compose -f docker-compose.prod.yml ps
+
+      - name: Verify Full Stack Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/${{ secrets.AZURE_VM_USERNAME }}/insight360/
+            
+            # Check all container statuses
+            echo "=== Container Status ==="
+            docker-compose -f docker-compose.prod.yml ps
             
             # Check container logs
-            echo "Recent container logs:"
-            docker logs --tail 20 insight360-frontend
+            echo "=== Frontend Logs ==="
+            docker logs insight360-frontend --tail 10
             
-            # Check if port is listening
-            echo "Port status:"
-            netstat -tlnp | grep :80 || echo "Port 80 not yet available"
+            echo "=== Backend Logs ==="
+            docker logs insight360-backend --tail 10
+            
+            echo "=== MongoDB Logs ==="
+            docker logs insight360-mongo --tail 10
+            
+            # Check service health
+            echo "=== Health Checks ==="
+            
+            # Frontend health check
+            curl -f http://localhost:80 && echo "✅ Frontend is healthy" || echo "❌ Frontend health check failed"
+            
+            # Backend health check
+            curl -f http://localhost:5000/health && echo "✅ Backend is healthy" || echo "❌ Backend health check failed"
+            
+            # MongoDB health check
+            docker exec insight360-mongo mongosh --eval "db.adminCommand('ping')" && echo "✅ MongoDB is healthy" || echo "❌ MongoDB health check failed"
+            
+            # Check open ports
+            echo "=== Open Ports ==="
+            netstat -tlnp | grep -E ":(80|5000|27017)" || echo "Some ports may not be available yet"

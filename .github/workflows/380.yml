@@ -142,7 +142,7 @@ jobs:
   deploy-to-azure:
     needs: docker-push
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/master' # Only deploy from master branch
+    if: github.ref == 'refs/heads/master' # Only deploy from master branch
 
     steps:
       - name: Checkout code

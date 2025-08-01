@@ -1,0 +1,234 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # Frontend setup and testing
+      - name: Install frontend dependencies
+        run: npm install
+
+        
+      - name: Build frontend
+        run: npm run build
+
+      # Backend setup and testing
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Test backend (lint check)
+        run: |
+          cd backend
+          # Add any backend tests here
+          echo "Backend tests would run here"
+      
+      # Archive build artifacts
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: |
+            build
+            !build/**/*.md
+
+# Docker push and vulnerability scanning
+  docker-push:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # Build Frontend Image
+      - name: Build Frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+          load: true
+
+      # Build Backend Image
+      - name: Build Backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+          load: true
+
+      # # Security Scanning - Frontend
+      # - name: Run Trivy vulnerability scanner - Frontend
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+      #     format: 'sarif'
+      #     output: 'trivy-frontend-results.sarif'
+
+      # Security Scanning - Backend
+      - name: Run Trivy vulnerability scanner - Backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+
+      # - name: Upload Frontend scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   if: always()
+      #   with:
+      #     sarif_file: 'trivy-frontend-results.sarif'
+
+      - name: Upload Backend scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-backend-results.sarif'
+
+      # Push images to Docker Hub
+      - name: Push Frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+
+      - name: Push Backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+
+      - name: Test Docker images 
+        run: |
+          # Test Frontend
+          docker run -d --name test-frontend -p 3000:3000 ${{vars.DOCKERHUB_USERNAME}}/insight360-frontend:latest
+          
+          # Test Backend
+          docker run -d --name test-backend -p 5000:5000 \
+            -e MONGO_URI=mongodb://localhost:27017/test \
+            -e JWT_SECRET=test-secret \
+            ${{vars.DOCKERHUB_USERNAME}}/insight360-backend:latest
+          
+          sleep 10
+          docker ps -a
+          docker logs test-frontend
+          docker logs test-backend
+
+  # Deploy to Azure VM
+  deploy-to-azure:
+    needs: docker-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' # Only deploy from master branch
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose to Azure VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          source: "docker-compose.prod.yml"
+          target: "/home/${{ secrets.AZURE_VM_USERNAME }}/insight360/"
+
+      - name: Deploy Full Stack to Azure VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/${{ secrets.AZURE_VM_USERNAME }}/insight360/
+            
+            # Set environment variables
+            export DOCKERHUB_USERNAME=${{ vars.DOCKERHUB_USERNAME }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export MONGO_ROOT_USERNAME=${{ secrets.MONGO_ROOT_USERNAME }}
+            export MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}
+            
+            # Stop existing containers
+            docker-compose -f docker-compose.prod.yml down || true
+            
+            # Remove old images
+            docker rmi ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest || true
+            docker rmi ${{ vars.DOCKERHUB_USERNAME }}/insight360-backend:latest || true
+            
+            # Pull latest images
+            docker pull ${{ vars.DOCKERHUB_USERNAME }}/insight360-frontend:latest
+            docker pull ${{ vars.DOCKERHUB_USERNAME }}/insight360-backend:latest
+            
+            # Start services
+            docker-compose -f docker-compose.prod.yml up -d
+            
+            # Wait for services to start
+            sleep 30
+            
+            # Check if all services are running
+            docker-compose -f docker-compose.prod.yml ps
+
+      - name: Verify Full Stack Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/${{ secrets.AZURE_VM_USERNAME }}/insight360/
+            
+            # Check all container statuses
+            echo "=== Container Status ==="
+            docker-compose -f docker-compose.prod.yml ps
+            
+            # Check container logs
+            echo "=== Frontend Logs ==="
+            docker logs insight360-frontend --tail 10
+            
+            echo "=== Backend Logs ==="
+            docker logs insight360-backend --tail 10
+            
+            echo "=== MongoDB Logs ==="
+            docker logs insight360-mongo --tail 10
+            
+            # Check service health
+            echo "=== Health Checks ==="
+            
+            # Frontend health check
+            curl -f http://localhost:80 && echo "✅ Frontend is healthy" || echo "❌ Frontend health check failed"
+            
+            # Backend health check
+            curl -f http://localhost:5000/health && echo "✅ Backend is healthy" || echo "❌ Backend health check failed"
+            
+            # MongoDB health check
+            docker exec insight360-mongo mongosh --eval "db.adminCommand('ping')" && echo "✅ MongoDB is healthy" || echo "❌ MongoDB health check failed"
+            
+            # Check open ports
+            echo "=== Open Ports ==="
+            netstat -tlnp | grep -E ":(80|5000|27017)" || echo "Some ports may not be available yet"

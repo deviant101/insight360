@@ -24,6 +24,11 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log('MongoDB connected'))
     .catch((error) => console.error('MongoDB connection error:', error));
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;

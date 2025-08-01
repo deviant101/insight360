@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7-jammy
+    container_name: insight360-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: insight360
+    volumes:
+      # - mongodb_data:/data/db
+      - ./backend/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - insight360-network
+
+  # Backend API (optional - for full containerization)
+  # backend:
+  #   build: ./backend
+  #   container_name: insight360-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - MONGO_URI=mongodb://root:example@mongodb:27017/insight360?authSource=admin
+  #   depends_on:
+  #     - mongodb
+  #   networks:
+  #     - insight360-network
+
+# volumes:
+#   mongodb_data:
+#     driver: local
+
+networks:
+  insight360-network:
+    driver: bridge

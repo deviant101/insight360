@@ -80,7 +80,6 @@ A comprehensive news aggregation platform built with React frontend, Node.js bac
 ```
 
 ## Project Structure
-The project structure is as follows:
 
 ```
 insight360/
@@ -323,75 +322,156 @@ The deployment process includes comprehensive monitoring:
 │   │   ├── manifest.json
 │   │   └── robots.txt
 │   ├── src/
-│   │   ├── assets/
-│   │   ├── components/
-│   │   │   ├── Footer.css
+│   │   ├── assets/           # Images and static assets
+│   │   │   ├── logo.png
+│   │   │   └── logo-2.png
+│   │   ├── components/       # React components
 │   │   │   ├── Footer.jsx
-│   │   │   ├── Header.css
+│   │   │   ├── Footer.css
 │   │   │   ├── Header.jsx
-│   │   │   ├── MainSection.css
+│   │   │   ├── Header.css
 │   │   │   ├── MainSection.jsx
-│   │   │   ├── Newsletter.css
+│   │   │   ├── MainSection.css
 │   │   │   ├── Newsletter.jsx
-│   │   │   ├── NewsList.css
+│   │   │   ├── Newsletter.css
 │   │   │   ├── NewsList.jsx
-│   │   │   ├── SearchArticle.css
+│   │   │   ├── NewsList.css
+│   │   │   ├── NewsPage.jsx
+│   │   │   ├── NewsPage.css
 │   │   │   ├── SearchArticle.jsx
-│   │   │   ├── SignIn.css
+│   │   │   ├── SearchArticle.css
 │   │   │   ├── SignIn.jsx
-│   │   │   ├── SignUp.css
+│   │   │   ├── SignIn.css
 │   │   │   ├── SignUp.jsx
-│   │   │   ├── VideoGallery.css
-│   │   │   └── VideoGallery.jsx
-│   │   ├── context/
+│   │   │   ├── SignUp.css
+│   │   │   ├── VideoGallery.jsx
+│   │   │   └── VideoGallery.css
+│   │   ├── context/          # React context for state management
 │   │   │   └── AuthContext.js
-│   │   ├── App.css
 │   │   ├── App.js
-│   │   ├── App.test.js
-│   │   ├── index.css
+│   │   ├── App.css
 │   │   ├── index.js
-│   │   ├── reportWebVitals.js
-│   │   └── setupTests.js
-│   ├── .env
+│   │   └── index.css
+│   ├── .env.example
+│   ├── .gitignore
 │   └── package.json
+├── backend/                  # Node.js backend API
+│   ├── controllers/
+│   │   └── authController.js
+│   ├── models/
+│   │   └── User.js
+│   ├── routes/
+│   │   └── authRoutes.js
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── mongo-init.js        # MongoDB initialization script
+│   ├── package.json
+│   └── server.js
 ├── .gitignore
+├── LICENSE
+├── docker-compose.yml       # Docker configuration for MongoDB
+├── insight360.code-workspace # VSCode workspace configuration
 └── README.md
 ```
 
 ## Installation
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/your-username/insight360.git
-    cd insight360
-    ```
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- MongoDB (local or cloud instance)
 
-2. Install dependencies for the frontend:
-    ```sh
-    cd frontend
-    npm install
-    ```
+### Quick Start
 
-3. Install dependencies for the backend:
-    ```sh
-    cd backend
-    npm install
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/deviant101/insight360.git
+   cd insight360
+   ```
+
+2. **Install dependencies for both frontend and backend:**
+   ```bash
+   # Install backend dependencies
+   cd backend
+   npm install
+   
+   # Install frontend dependencies
+   cd ../frontend
+   npm install
+   ```
+
+3. **Set up environment variables:**
+   - Copy `.env.example` to `.env` in both `frontend` and `backend` directories
+   - Fill in your actual values
+
+4. **Start MongoDB using Docker:**
+   ```bash
+   # From the root directory
+   docker-compose up -d mongodb
+   ```
+
+5. **Start the backend server:**
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+6. **Start the frontend application:**
+   ```bash
+   cd frontend
+   npm start
+   ```
+
+### Manual Installation
+
+If you prefer to install and run each part separately:
+
+1. **Install backend dependencies:**
+   ```bash
+   cd backend
+   npm install
+   ```
+
+2. **Install frontend dependencies:**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
 ## Environment Variables
 
-Create a `.env` file in the `backend` directory and add the following environment variables:
+### Backend (`backend/.env`)
+```env
+# MongoDB connection string
+# For local development with Docker
+MONGO_URI=mongodb://root:example@localhost:27017/insight360?authSource=admin
 
-```sh
-MONGO_URI=<your-mongodb-uri>
-JWT_SECRET=<your-jwt-secret>
+# Alternative: Using the created application user
+# MONGO_URI=mongodb://insight360_user:insight360_pass@localhost:27017/insight360
+
+# For production (replace with your actual MongoDB URI)
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/insight360?retryWrites=true&w=majority
+
+# JWT Secret for authentication
+JWT_SECRET=7f4e0a86bcd844b89a8c62e1c235bc42f0e7e0e279b54688b08f9b2dc85d8ab0
+
+# Server port
 PORT=5000
+
+# Node environment
+NODE_ENV=development
 ```
 
-Create a `.env` file in the `frontend` directory and add the following environment variables:
+### Frontend (`frontend/.env`)
+```env
+# News API Key from https://newsapi.org/
+REACT_APP_NEWS_API_KEY=your_news_api_key_here
 
-```sh
-REACT_APP_NEWS_KEY=<your-news-api-key>
+# Backend API URL (for production)
+REACT_APP_API_URL=http://YOUR_VM_IP:5000
 ```
+
+> **Note:** Get your News API key from [NewsAPI.org](https://newsapi.org/)
 
 ## Running the Project
 

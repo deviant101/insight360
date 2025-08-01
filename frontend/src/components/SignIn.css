@@ -33,6 +33,17 @@
     padding-bottom: 30px;
 }
 
+/* Error Message Styling */
+.error-message {
+    color: #ff4444;
+    background-color: #ffebee;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid #ffcdd2;
+}
+
 /* Form Styling */
 .signin-form {
     display: flex;
